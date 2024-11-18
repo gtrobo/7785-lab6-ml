@@ -10,6 +10,9 @@
 7. Edit line 80 of this code and supply the path of the test dataset folder. Save and exit.
 8. In the same directory, run the tester code: `python3 model_tester.py`. Prediction labels, accuracy, and classification report are printed to the terminal.
 9. To exit out of the virtual environment, use the command `deactivate`.
- 
+________
+
+![Confusion Matrix](/ConfusionMatrix.png)
+________
 #### Group 33: Pratheek Manjunath, Chris Meier, GLTron.<br>
-pratheek.m@gatech.edu<br>
+pratheek.m@gatech.edu
