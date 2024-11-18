@@ -4,5 +4,5 @@ scipy >= 1.14
 joblib >= 1.4
 threadpoolctl >= 3.5
 scikit-learn >= 1.5.2
-tensorflow >= 2.18
+pillow
 imutils
