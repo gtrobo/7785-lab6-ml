@@ -1,5 +1,5 @@
 # Add Python tools and libraries to this text file
-numpy >= 2.0
+numpy < 2.0
 scipy >= 1.14
 joblib >= 1.4
 threadpoolctl >= 3.5
