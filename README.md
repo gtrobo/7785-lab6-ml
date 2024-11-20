@@ -7,7 +7,7 @@
 4. Install Python libraries and dependencies: `pip install -r 7785-lab6-ml/requirements.txt`. Pip may take a few minutes to complete installing all the modules.
 5. Inspect the contents of the 7785-lab6-ml directory to ensure that the following two files exist among others: `cd 7785-lab6-ml` and look for `vision33_classifier.pkl` and `model_tester.py`.
 6. Open the model_tester code in a text editor or IDE of your choice: `gedit model_tester.py` or `code model_tester.py`.
-7. Edit line 80 of this code and supply the path of the test dataset folder. Save and exit.
+7. Edit line 12 of this code and supply the path of the test dataset folder. Save and exit.
 8. In the same directory, run the tester code: `python3 model_tester.py`. Prediction labels, accuracy, and classification report are printed to the terminal.
 9. To exit out of the virtual environment, use the command `deactivate`.
 ________
