@@ -6,3 +6,4 @@ threadpoolctl >= 3.5
 scikit-learn >= 1.5.2
 pillow
 imutils
+matplotlib
