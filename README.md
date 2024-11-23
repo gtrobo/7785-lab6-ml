@@ -17,7 +17,7 @@
 10. To exit, close the pop-up, Ctrl + C in the terminal, and `deactivate` the virtual environment.
 ________
 
-![Confusion Matrix](/ConfusionMatrix.png)
+![Confusion Matrix](/ConfusionMatrix-builder.png)
 ________
 #### Group 33: Pratheek Manjunath, Chris Meier, GLTron.<br>
 pratheek.m@gatech.edu
