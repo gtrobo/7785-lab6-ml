@@ -3,7 +3,8 @@ numpy < 2.0
 scipy >= 1.14
 joblib >= 1.4
 threadpoolctl >= 3.5
-scikit-learn >= 1.5.2
 pillow
 imutils
 matplotlib
+torch
+torchvision

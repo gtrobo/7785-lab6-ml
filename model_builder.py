@@ -1,22 +1,24 @@
 # AE/ME 7785 IRR. Pratheek Manjunath and Chris Meier. Lab 6 Part 1. 
-# Script to build the sign classifier using Scikit-learn's Multi-layer Perceptron (MLP) supervised learning algorithm.
-
+# Script to build the sign classifier using PyTorch based CNN based
 import os
 import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-from sklearn.neural_network import MLPClassifier
-from sklearn.metrics import classification_report, accuracy_score, confusion_matrix, ConfusionMatrixDisplay
-from sklearn.utils import shuffle
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader, TensorDataset, random_split
+import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 from PIL import Image
-import joblib
+from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
 
 # Constants
-IMAGE_SIZE = (64, 64)  # Resize images. Tried 128 x 128 which was inferior.
+IMAGE_SIZE = (64, 64)  # Resize images to 64x64
 DATA_FOLDER = "/home/pratheek/Downloads/Curated"
-RANDOM_SEED = 787
+RANDOM_SEED = 747
+BATCH_SIZE = 16
+EPOCHS = 15
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 CLASS_LABELS = {
     0: "empty wall",
     1: "left",
@@ -26,72 +28,153 @@ CLASS_LABELS = {
     5: "goal"
 }
 
+# CNN Model definition with 5 layers
+class CNNModel(nn.Module):
+    def __init__(self):
+        super(CNNModel, self).__init__()
+        self.conv_layers = nn.Sequential(
+            # First Convolutional Block
+            nn.Conv2d(3, 32, kernel_size=3, padding=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(2, 2),
+            
+            # Second Convolutional Block
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(2, 2),
+            
+            # Third Convolutional Block
+            nn.Conv2d(64, 128, kernel_size=3, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+            nn.MaxPool2d(2, 2),
+            
+            # Fourth Convolutional Block
+            nn.Conv2d(128, 256, kernel_size=3, padding=1),
+            nn.BatchNorm2d(256),
+            nn.ReLU(),
+            nn.MaxPool2d(2, 2),
+            
+            # Fifth Convolutional Block
+            nn.Conv2d(256, 512, kernel_size=3, padding=1),
+            nn.BatchNorm2d(512),
+            nn.ReLU(),
+            nn.MaxPool2d(2, 2),
+        )
+        
+        # After the last pooling layer, calculate the output size of the feature map
+        self._conv_output_size = self._get_conv_output_size(IMAGE_SIZE)
+        
+        # Fully Connected Layers
+        self.fc_layers = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(self._conv_output_size, 1024),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(1024, 6)  # 6 classes
+        )
+    
+    def _get_conv_output_size(self, input_size):
+        # Assuming square input (height == width)
+        h, w = input_size  # Unpack the height and width
+        for _ in range(5):  # 5 pooling layers (one per conv block)
+            h = (h - 2) // 2 + 1  # MaxPool2d(2, 2) halves the size
+            w = (w - 2) // 2 + 1  # MaxPool2d(2, 2) halves the size
+        return h * w * 512  # Output size times the number of channels
+
+    def forward(self, x):
+        x = self.conv_layers(x)
+        x = self.fc_layers(x)
+        return x
+
+# Load and preprocess images
 def load_images_and_labels(data_folder):
-    # Load images and their labels from the curated folder
     images = []
     labels = []
+    transform = transforms.Compose([
+        transforms.Resize(IMAGE_SIZE),
+        transforms.ToTensor(),
+        transforms.Normalize((0.5,), (0.5,))  # Normalization for RGB
+    ])
+    
     for label_str in os.listdir(data_folder):
         label_path = os.path.join(data_folder, label_str)
         if os.path.isdir(label_path):
-            label = int(label_str)  # Folder names should correspond to labels
+            label = int(label_str)
             for file_name in os.listdir(label_path):
                 file_path = os.path.join(label_path, file_name)
                 try:
                     image = Image.open(file_path).convert("RGB")
-                    image = image.resize(IMAGE_SIZE)
-                    images.append(np.array(image).flatten())
+                    image = transform(image)
+                    images.append(image)
                     labels.append(label)
                 except Exception as e:
                     print(f"Error loading {file_path}: {e}")
-    return np.array(images), np.array(labels)
+    return torch.stack(images), torch.tensor(labels)
 
 def main():
-    # Load dataset
     print("Loading images...")
     X, y = load_images_and_labels(DATA_FOLDER)
-    X, y = shuffle(X, y, random_state=RANDOM_SEED)
     print(f"Loaded {len(y)} images.")
-    
+
     # Split dataset
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=RANDOM_SEED)
+    dataset = TensorDataset(X, y)
+    train_size = int(0.8 * len(dataset))
+    test_size = len(dataset) - train_size
+    train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
+    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
     
-    # Normalize the data
-    X_train = X_train / 255.0
-    X_test = X_test / 255.0
-
-    # Standardize data
-    scaler = StandardScaler()
-    X_train = scaler.fit_transform(X_train)
-    X_test = scaler.transform(X_test)
-
-    # Save the scaler for testing
-    joblib.dump(scaler, 'scaler33.pkl')
-    print("Scaler saved as 'scaler33.pkl'.")
-
-    # Create MLP classifier
-    print("Training the MLP classifier...")
-    model = MLPClassifier(hidden_layer_sizes=(256, 128), activation='relu', solver='adam', alpha=0.0001, 
-                          learning_rate='adaptive', max_iter=500, random_state=RANDOM_SEED) # tried tanh, nadam, gelu, sgd, lbfgs.
-    model.fit(X_train, y_train)
+    # Initialize model, optimizer, and loss function
+    model = CNNModel().to(DEVICE)
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    criterion = nn.CrossEntropyLoss()
     
-    # Evaluate the model
-    print("Evaluating the model...")
-    y_pred = model.predict(X_test)
-    print("Accuracy:", accuracy_score(y_test, y_pred))
-    print("\nClassification Report:\n", classification_report(y_test, y_pred, target_names=CLASS_LABELS.values()))
-
+    # Training loop
+    for epoch in range(EPOCHS):
+        model.train()
+        total_loss = 0
+        for images, labels in train_loader:
+            images, labels = images.to(DEVICE), labels.to(DEVICE)
+            optimizer.zero_grad()
+            outputs = model(images)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+            total_loss += loss.item()
+        
+        print(f"Epoch [{epoch+1}/{EPOCHS}], Loss: {total_loss/len(train_loader):.4f}")
+    
+    # Evaluation
+    model.eval()
+    correct = 0
+    total = 0
+    all_preds, all_labels = [], []
+    
+    with torch.no_grad():
+        for images, labels in test_loader:
+            images, labels = images.to(DEVICE), labels.to(DEVICE)
+            outputs = model(images)
+            _, predicted = torch.max(outputs.data, 1)
+            correct += (predicted == labels).sum().item()
+            total += labels.size(0)
+            all_preds.extend(predicted.cpu().numpy())
+            all_labels.extend(labels.cpu().numpy())
+    
+    print(f"Test Accuracy: {100 * correct / total:.2f}%")
+    print("\nClassification Report:\n", classification_report(all_labels, all_preds, target_names=CLASS_LABELS.values()))
     # Generate and display the confusion matrix
-    print("Generating confusion matrix...")
-    cm = confusion_matrix(y_test, y_pred, labels=list(CLASS_LABELS.keys()))
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=CLASS_LABELS.values())
+    cm = confusion_matrix(all_labels, all_preds)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=list(CLASS_LABELS.values()))
     disp.plot(cmap=plt.cm.Blues)
-    plt.tight_layout()
     plt.title("Confusion Matrix")
     plt.show()
 
-    # Save the model
-    joblib.dump(model, "vision33_classifier.pkl")
-    print("Model saved as vision33_classifier, after the name of our group")
+    # Save the trained model
+    torch.save(model.state_dict(), "vision33_classifier.pth")
+    print("Model saved as 'vision33_classifier.pth'.")
 
 if __name__ == "__main__":
     main()
