@@ -5,7 +5,7 @@
 2. Create a Python virtual environment and activate it: `python3 -m venv vision33` and `source vision33/bin/activate` .
 3. Clone this repository inside the virtual environment subdirectory: `cd vision33` and then `git clone git@github.com:gtrobo/7785-lab6-ml.git`.
 4. Install Python libraries and dependencies: `pip install -r 7785-lab6-ml/requirements.txt`. Pip may take a few minutes to complete installing all the modules.
-5. Inspect the contents of the 7785-lab6-ml directory to ensure that the following two files exist among others: `cd 7785-lab6-ml` and look for `vision33_classifier.pkl` and `model_tester.py`.
+5. Inspect the contents of the 7785-lab6-ml directory to ensure that the following two files exist among others: `cd 7785-lab6-ml` and look for `resnet18_classifier.pth` and `model_tester.py`.
 6. Open the model_tester code in a text editor or IDE of your choice: `gedit model_tester.py` or `code model_tester.py`.
 7. Edit line 13 of this code and supply the path of the test dataset folder. Save and exit.
 8. Before running the model tester code, we need to ensure that the test data folder is prepared with subfolders named 0, 1, 2, 3, 4, and 5, correspoding to the labels of the images. 

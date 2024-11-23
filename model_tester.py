@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 # Constants
 MODEL_PATH = "resnet18_classifier.pth"  # Path to your saved model
-TEST_DATA_FOLDER = "/home/pratheek/Downloads/test-CNN"  # Change to your actual test data path
+TEST_DATA_FOLDER = "/home/pratheek/Downloads/test-CNN"  # Provide path to 2024F_G. Must contain subfolders 0 through 5.
 IMAGE_SIZE = (224, 224)  # Resize images to match model input
 CLASS_LABELS = {
     0: "empty wall",
