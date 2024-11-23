@@ -136,7 +136,8 @@ def evaluate():
     cm = confusion_matrix(all_labels, all_preds)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=list(CLASS_LABELS.values()))
     disp.plot(cmap=plt.cm.Blues)
-    plt.title("Confusion Matrix")
+    plt.tight_layout()
+    plt.title("Confusion Matrix (Post-build evaluation with 80-20 data split)")
     plt.show()
 
 if __name__ == "__main__":

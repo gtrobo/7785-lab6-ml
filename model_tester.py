@@ -1,4 +1,4 @@
-# AE/ME 7785 IRR. Pratheek Manjunath and Chris Meier. Lab 6 Part 1. Script to test the classification model built using Scikit-learn's MLP algorithm.
+# AE/ME 7785 IRR. Pratheek Manjunath and Chris Meier. Lab 6 Part 1. Script to test the classification model built using PyTorch and ResNet18.
 import os
 import numpy as np
 from PIL import Image
@@ -99,7 +99,7 @@ def test_model():
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=CLASS_LABELS.values())
     disp.plot(cmap=plt.cm.Oranges)
     plt.tight_layout()
-    plt.title("Confusion Matrix")
+    plt.title("Confusion Matrix (Test data)")
     plt.show()
 
 if __name__ == "__main__":
