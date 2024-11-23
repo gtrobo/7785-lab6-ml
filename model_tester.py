@@ -140,6 +140,7 @@ def test_model():
     cm = confusion_matrix(true_labels, predicted, labels=list(CLASS_LABELS.keys()))
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=CLASS_LABELS.values())
     disp.plot(cmap=plt.cm.Oranges)
+    plt.tight_layout()
     plt.title("Confusion Matrix")
     plt.show()
 

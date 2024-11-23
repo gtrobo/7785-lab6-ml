@@ -169,6 +169,7 @@ def main():
     cm = confusion_matrix(all_labels, all_preds)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=list(CLASS_LABELS.values()))
     disp.plot(cmap=plt.cm.Blues)
+    plt.tight_layout()
     plt.title("Confusion Matrix")
     plt.show()
 
