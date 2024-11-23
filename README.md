@@ -18,6 +18,7 @@
 ________
 
 ![Confusion Matrix](/ConfusionMatrix-builder.png)
+![Confusion Matrix](/ConfusionMatrix-tester.png)
 ________
 #### Group 33: Pratheek Manjunath, Chris Meier, GLTron.<br>
 pratheek.m@gatech.edu
